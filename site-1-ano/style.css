@@ -310,7 +310,7 @@ body {
 
 .timeline-item {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
     width: 100%;
     margin-bottom: 4rem;
@@ -325,7 +325,7 @@ body {
 }
 
 .timeline-item:nth-child(odd) {
-    flex-direction: row-reverse;
+    justify-content: flex-start;
 }
 
 .timeline-content {
@@ -518,7 +518,7 @@ body {
     }
     
     .timeline-item {
-        flex-direction: row !important;
+        justify-content: flex-end !important;
     }
     
     .timeline-item .timeline-date {

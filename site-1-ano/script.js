@@ -59,12 +59,18 @@ document.addEventListener('DOMContentLoaded', () => {
         estimated: !!entry.estimated
     }));
 
-    // Format date beautifully ("≈" marca data aproximada)
-    const formatDate = (item) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const text = new Date(item.date).toLocaleDateString('pt-BR', options);
-        return item.estimated ? `≈ ${text}` : text;
-    };
+    // "ultima.jpeg" não está no manifesto: fecha a timeline no aniversário
+    mediaItems.push({
+        filename: 'ultima.jpeg',
+        path: basePath + 'ultima.jpeg',
+        date: new Date('2026-06-02T12:00:00').getTime(),
+        isVideo: false,
+        estimated: false
+    });
+
+    // Apenas a primeira e a última memória têm legenda
+    mediaItems[0].caption = '2 de junho de 2025';
+    mediaItems[mediaItems.length - 1].caption = '2 de junho de 2026';
 
     // Marquee Injection (Random 15 images)
     const marqueeTrack = document.getElementById('marquee-track');
@@ -100,10 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `<video src="${item.path}" muted loop playsinline preload="metadata"></video>`
             : `<img src="${item.path}" alt="Cosmo" loading="lazy">`;
 
+        const dateLabel = item.caption
+            ? `<div class="timeline-date">${item.caption}</div>`
+            : '';
+
         div.innerHTML = `
             <div class="timeline-dot"></div>
             <div class="timeline-content" onclick="openLightbox(${index})">
-                <div class="timeline-date">${formatDate(item)}</div>
+                ${dateLabel}
                 <div class="media-container">
                     ${mediaContent}
                 </div>
@@ -154,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let item = typeof target === 'number' ? mediaItems[target] : target;
 
         lightbox.classList.add('active');
-        lightboxCaption.textContent = formatDate(item);
+        lightboxCaption.textContent = item.caption || '';
 
         if (item.isVideo) {
             lightboxImg.style.display = 'none';
