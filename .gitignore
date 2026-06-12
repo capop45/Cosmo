@@ -1,4 +1,8 @@
+# Vídeos originais ficam fora do repositório (GitHub rejeita arquivos > 100 MB).
+# As versões comprimidas *_web.mp4 (scripts/compress-videos-web.ps1) SÃO
+# versionadas e é o que o site exibe na timeline.
 *.mp4
 *.MP4
 *.mov
 *.MOV
+!*_web.mp4
