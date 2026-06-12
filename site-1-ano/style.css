@@ -59,6 +59,59 @@ body {
     text-align: center;
     padding: 2rem;
     position: relative;
+    overflow: hidden;
+}
+
+/* Space Elements Styling */
+.space-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.rocket, .astronaut, .planet {
+    position: absolute;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+    opacity: 0.8;
+}
+
+.rocket {
+    top: 15%;
+    left: 10%;
+    animation: floatRocket 15s ease-in-out infinite;
+}
+
+.astronaut {
+    bottom: 25%;
+    right: 15%;
+    animation: floatAstronaut 20s ease-in-out infinite;
+}
+
+.planet {
+    top: 20%;
+    right: 25%;
+    font-size: clamp(3rem, 6vw, 5rem);
+    animation: floatPlanet 25s ease-in-out infinite;
+}
+
+@keyframes floatRocket {
+    0%, 100% { transform: translateY(0) rotate(15deg) translateX(0); }
+    50% { transform: translateY(-30px) rotate(25deg) translateX(20px); }
+}
+
+@keyframes floatAstronaut {
+    0%, 100% { transform: translateY(0) rotate(-10deg); }
+    50% { transform: translateY(40px) rotate(10deg); }
+}
+
+@keyframes floatPlanet {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-15px) scale(1.05); }
 }
 
 .hero-content {
@@ -71,6 +124,7 @@ body {
     box-shadow: var(--glass-shadow);
     transform: translateY(20px);
     opacity: 0;
+    z-index: 2;
     animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -97,7 +151,7 @@ body {
 
 .title {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(3rem, 8vw, 6rem);
+    font-size: clamp(2.5rem, 8vw, 6rem);
     line-height: 1.1;
     margin-bottom: 1rem;
 }
@@ -111,7 +165,7 @@ body {
 
 .scroll-indicator {
     position: absolute;
-    bottom: 2rem;
+    bottom: 1rem;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -121,6 +175,7 @@ body {
     color: var(--text-muted);
     font-size: 0.875rem;
     opacity: 0.7;
+    z-index: 2;
     animation: bounce 2s infinite;
 }
 
@@ -444,6 +499,11 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .hero-content {
+        padding: 1.5rem;
+        margin: 0 1rem;
+    }
+    
     .timeline::before {
         left: 20px;
     }
@@ -464,5 +524,12 @@ body {
     .timeline-item .timeline-date {
         left: 0;
         top: -2rem;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
     }
 }
+
