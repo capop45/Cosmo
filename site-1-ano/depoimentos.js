@@ -268,20 +268,19 @@
         }
 
         function aplicarKenBurns(slide) {
-            // Zoom + deslocamento suave em direção aleatória (efeito vitrine)
-            const startScale = 1.0 + Math.random() * 0.06;
-            const endScale = 1.15 + Math.random() * 0.12;
-            const x = (Math.random() * 6 - 3).toFixed(2);
-            const y = (Math.random() * 6 - 3).toFixed(2);
-            const ox = (Math.random() * 100).toFixed(0);
-            const oy = (Math.random() * 100).toFixed(0);
-            slide.style.transformOrigin = `${ox}% ${oy}%`;
+            // Zoom + deslocamento suave aplicado SÓ no fundo desfocado.
+            // A foto principal (background-size: contain) fica parada e inteira.
+            const startScale = 1.1 + Math.random() * 0.05;
+            const endScale = 1.22 + Math.random() * 0.1;
+            const x = (Math.random() * 4 - 2).toFixed(2);
+            const y = (Math.random() * 4 - 2).toFixed(2);
             slide.style.setProperty('--kb-from', `scale(${startScale}) translate(0, 0)`);
             slide.style.setProperty('--kb-to', `scale(${endScale}) translate(${x}%, ${y}%)`);
-            // Reinicia a animação
-            slide.style.animation = 'none';
+            slide.style.setProperty('--kb-dur', `${(DURACAO + 1600) / 1000}s`);
+            // Reinicia a animação do ::before
+            slide.classList.remove('kb-run');
             void slide.offsetWidth; // reflow
-            slide.style.animation = `kenburns ${(DURACAO + 1600) / 1000}s ease-out forwards`;
+            slide.classList.add('kb-run');
         }
 
         function proximaImagem() {

@@ -864,21 +864,44 @@ body {
 .slideshow-slide {
     position: absolute;
     inset: 0;
-    background-size: cover;
+    /* Mostra a foto INTEIRA, sem cortar */
+    background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
     transition: opacity 1.6s ease-in-out;
-    will-change: opacity, transform;
+    will-change: opacity;
+}
+
+/* Fundo desfocado da mesma foto, preenchendo as bordas vazias */
+.slideshow-slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: inherit;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(40px) brightness(0.45);
+    transform: scale(1.1);
+    transform-origin: center;
+    will-change: transform;
 }
 
 .slideshow-slide.show {
     opacity: 1;
 }
 
+/* Ken Burns aplicado APENAS no fundo desfocado, para a foto principal
+   permanecer parada e totalmente visível */
+.slideshow-slide.kb-run::before {
+    animation: kenburns var(--kb-dur, 8s) ease-out forwards;
+}
+
 @keyframes kenburns {
-    from { transform: var(--kb-from, scale(1)); }
-    to   { transform: var(--kb-to, scale(1.15)); }
+    from { transform: var(--kb-from, scale(1.1)); }
+    to   { transform: var(--kb-to, scale(1.25)); }
 }
 
 .slideshow-close {
