@@ -11,6 +11,13 @@
 <body>
     <div id="particles-js"></div>
 
+    <!-- Barra de navegação fixa no topo -->
+    <nav class="top-nav">
+        <button class="nav-btn" id="btn-novo-depoimento">💬 Deixar Depoimento</button>
+        <button class="nav-btn" id="btn-ver-depoimentos">📖 Depoimentos</button>
+        <button class="nav-btn nav-btn-accent" id="btn-slideshow">🎞️ Slide Show</button>
+    </nav>
+
     <header class="hero">
         <div class="space-elements">
             <div class="rocket">🚀</div>
@@ -54,12 +61,58 @@
             <img id="lightbox-img" src="" alt="Imagem ampliada" style="display: none;">
             <video id="lightbox-video" controls loop playsinline style="display: none;"></video>
             <div class="lightbox-caption" id="lightbox-caption"></div>
+
+            <!-- Depoimentos individuais da foto aberta -->
+            <div class="lightbox-depoimentos" id="lightbox-depoimentos">
+                <button type="button" class="depo-toggle" id="depo-toggle">
+                    💬 Depoimentos desta foto (<span id="depo-count">0</span>)
+                </button>
+                <div class="depo-panel" id="depo-panel">
+                    <div class="depo-panel-list" id="depo-panel-list"></div>
+                    <form class="depo-foto-form" id="depo-foto-form">
+                        <input type="text" name="nome" placeholder="Seu nome" maxlength="60" autocomplete="name" required>
+                        <textarea name="texto" placeholder="Escreva um depoimento sobre esta foto..." maxlength="400" required></textarea>
+                        <button type="submit">Enviar depoimento</button>
+                    </form>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <!-- Modal: deixar depoimento geral -->
+    <div class="modal-overlay" id="modal-form">
+        <div class="modal-card">
+            <span class="modal-close" data-close-modal>&times;</span>
+            <h3 class="modal-title">Deixe seu depoimento</h3>
+            <p class="modal-sub">Compartilhe uma memória ou mensagem especial.</p>
+            <form id="form-depoimento-geral">
+                <input type="text" name="nome" placeholder="Seu nome" maxlength="60" autocomplete="name" required>
+                <textarea name="texto" placeholder="Escreva seu depoimento..." maxlength="500" required></textarea>
+                <button type="submit">Enviar depoimento</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: lista de depoimentos gerais -->
+    <div class="modal-overlay" id="modal-lista">
+        <div class="modal-card modal-card-wide">
+            <span class="modal-close" data-close-modal>&times;</span>
+            <h3 class="modal-title">Depoimentos</h3>
+            <div class="depoimentos-list" id="depoimentos-list"></div>
+        </div>
+    </div>
+
+    <!-- Slide Show em tela cheia -->
+    <div class="slideshow-overlay" id="slideshow-overlay">
+        <button type="button" class="slideshow-close" id="slideshow-close">&times;</button>
+        <div class="slideshow-stage" id="slideshow-stage"></div>
+        <div class="slideshow-hint" id="slideshow-hint">Pressione ESC para sair</div>
     </div>
 
     <!-- Particles.js for Celebration effect -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script src="manifest.js"></script>
     <script src="script.js"></script>
+    <script src="depoimentos.js"></script>
 </body>
 </html>

@@ -72,6 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     mediaItems[0].caption = '2 de junho de 2025';
     mediaItems[mediaItems.length - 1].caption = '2 de junho de 2026';
 
+    // Exposto para o slide show e o sistema de depoimentos (depoimentos.js)
+    window.mediaItems = mediaItems;
+
     // Marquee Injection (Random 15 images)
     const marqueeTrack = document.getElementById('marquee-track');
     const shuffledForMarquee = [...mediaItems].filter(m => !m.isVideo).sort(() => 0.5 - Math.random()).slice(0, 15);
@@ -165,6 +168,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         lightbox.classList.add('active');
         lightboxCaption.textContent = item.caption || '';
+
+        // Atualiza o painel de depoimentos individuais da foto (depoimentos.js)
+        window.currentLightboxItem = item;
+        if (window.refreshFotoDepoimentos) window.refreshFotoDepoimentos(item);
 
         if (item.isVideo) {
             lightboxImg.style.display = 'none';
