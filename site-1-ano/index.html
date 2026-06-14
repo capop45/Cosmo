@@ -27,7 +27,21 @@
         <div class="hero-content">
             <div class="badge">Celebração Estelar</div>
             <h1 class="title">1 Ano de <span class="gradient-text">Cosmo</span></h1>
-            <p class="subtitle">Uma jornada inesquecível pelo tempo e espaço, capturada em memórias cósmicas.</p>
+            <p class="subtitle">Uma constelação de memórias — do primeiro suspiro à festa de 1 ano.</p>
+
+            <!-- Portais destacados: início (nascimento) e fim (festa) da jornada -->
+            <div class="portals">
+                <button class="portal portal-nascimento" id="portal-nascimento">
+                    <span class="portal-emoji">⭐</span>
+                    <span class="portal-label">Nascimento</span>
+                    <span class="portal-date">02 de junho de 2025</span>
+                </button>
+                <button class="portal portal-festa" id="portal-festa">
+                    <span class="portal-emoji">🎉</span>
+                    <span class="portal-label">A Festa</span>
+                    <span class="portal-date">1 ano depois...</span>
+                </button>
+            </div>
         </div>
         <div class="scroll-indicator">
             <span>Deslize para explorar</span>
@@ -43,16 +57,29 @@
         </div>
     </section>
 
-    <main class="timeline-container">
-        <h2 class="section-title">Nossa História</h2>
-        <div class="timeline" id="timeline">
-            <!-- Timeline injetada via JS -->
+    <main class="cloud-container">
+        <h2 class="section-title">Nuvem de Memórias</h2>
+        <p class="cloud-sub">Um ano inteiro espalhado sem ordem — clique em qualquer momento.</p>
+        <div class="photo-cloud" id="photo-cloud">
+            <!-- Nuvem de fotos injetada via JS -->
         </div>
     </main>
 
     <footer class="footer">
         <p>Com amor, guardando nossos melhores momentos. &copy; 2026 Cosmo</p>
     </footer>
+
+    <!-- Galeria de uma coleção (Nascimento / Festa) -->
+    <div class="gallery-overlay" id="gallery-overlay">
+        <div class="gallery-panel">
+            <button type="button" class="gallery-close" id="gallery-close">&times;</button>
+            <div class="gallery-header">
+                <h2 class="gallery-title" id="gallery-title"></h2>
+                <p class="gallery-sub" id="gallery-sub"></p>
+            </div>
+            <div class="gallery-grid" id="gallery-grid"></div>
+        </div>
+    </div>
 
     <!-- Lightbox -->
     <div class="lightbox" id="lightbox">

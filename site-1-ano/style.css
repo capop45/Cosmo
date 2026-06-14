@@ -163,6 +163,62 @@ body {
     margin: 0 auto;
 }
 
+/* Portais destacados (Nascimento / Festa) */
+.portals {
+    display: flex;
+    gap: 1.25rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2.25rem;
+}
+
+.portal {
+    font-family: 'Outfit', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 210px;
+    padding: 1.4rem 1.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 1.5rem;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+.portal:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+    filter: brightness(1.08);
+}
+
+.portal-nascimento {
+    background: linear-gradient(135deg, #2563eb, #8b5cf6);
+}
+
+.portal-festa {
+    background: linear-gradient(135deg, #ec4899, #f59e0b);
+}
+
+.portal-emoji {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.portal-label {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.portal-date {
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.92;
+}
+
 .scroll-indicator {
     position: absolute;
     bottom: 1rem;
@@ -264,7 +320,180 @@ body {
     100% { transform: translateX(-50%); }
 }
 
-/* Timeline */
+/* Nuvem de Memórias (mosaico embaralhado) */
+.cloud-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 5rem 1.5rem;
+    position: relative;
+    z-index: 10;
+}
+
+.cloud-sub {
+    text-align: center;
+    color: var(--text-muted);
+    margin: -2.5rem auto 3rem;
+    max-width: 600px;
+}
+
+.photo-cloud {
+    columns: 4 240px;
+    column-gap: 1rem;
+}
+
+.cloud-item {
+    margin: 0 0 1rem;
+    break-inside: avoid;
+    border-radius: 1rem;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.cloud-item.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.cloud-item:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    border-color: var(--accent-2);
+}
+
+.cloud-item img,
+.cloud-item video {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 0.5s ease;
+}
+
+.cloud-item:hover img,
+.cloud-item:hover video {
+    transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+    .photo-cloud {
+        columns: 2 140px;
+        column-gap: 0.6rem;
+    }
+    .cloud-item {
+        margin-bottom: 0.6rem;
+    }
+}
+
+/* ===================================================== */
+/*  Galeria de coleção (Nascimento / Festa)              */
+/* ===================================================== */
+.gallery-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: rgba(2, 6, 23, 0.92);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    overflow-y: auto;
+    transition: opacity 0.4s ease;
+}
+
+.gallery-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.gallery-panel {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem 4rem;
+}
+
+.gallery-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.gallery-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    background: linear-gradient(to right, var(--accent-1), var(--accent-2), var(--accent-3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gallery-sub {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-top: 0.4rem;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.gallery-cell {
+    aspect-ratio: 1 / 1;
+    border-radius: 1rem;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.gallery-cell:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
+    border-color: var(--accent-2);
+}
+
+.gallery-cell img,
+.gallery-cell video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.gallery-close {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.5rem;
+    z-index: 2;
+    font-size: 2.5rem;
+    line-height: 1;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.gallery-close:hover {
+    transform: rotate(90deg);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 600px) {
+    .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 0.6rem;
+    }
+}
+
+/* Timeline (legado — mantido para referência, não usado no layout atual) */
 .timeline-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -435,7 +664,7 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(10px);
-    z-index: 1000;
+    z-index: 1600; /* acima da galeria (1050) e dos modais (1100) */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -864,8 +1093,9 @@ body {
 .slideshow-slide {
     position: absolute;
     inset: 0;
-    /* Mostra a foto INTEIRA, sem cortar */
-    background-size: contain;
+    /* A imagem é pintada pelos pseudo-elementos abaixo; aqui só guardamos
+       o background-image (definido via JS) para que ::before/::after o herdem. */
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
@@ -873,12 +1103,12 @@ body {
     will-change: opacity;
 }
 
-/* Fundo desfocado da mesma foto, preenchendo as bordas vazias */
+/* Fundo desfocado da mesma foto, preenchendo as bordas vazias (camada de baixo) */
 .slideshow-slide::before {
     content: "";
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: 0;
     background-image: inherit;
     background-size: cover;
     background-position: center;
@@ -889,7 +1119,37 @@ body {
     will-change: transform;
 }
 
+/* Foto principal INTEIRA, sem cortar (camada de cima) */
+.slideshow-slide::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background-image: inherit;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 .slideshow-slide.show {
+    opacity: 1;
+}
+
+/* Vídeos no slide show: mostra o vídeo inteiro, sem corte */
+.slideshow-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.slideshow-video.show {
     opacity: 1;
 }
 

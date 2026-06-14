@@ -251,12 +251,14 @@
         const btnClose = document.getElementById('slideshow-close');
 
         let slides = [];          // os dois <div> que se alternam
+        let videoEl = null;       // elemento de vídeo do slide show
         let frontIndex = 0;       // qual slide está visível
-        let ordem = [];           // ordem aleatória dos caminhos
+        let ordem = [];           // ordem aleatória das mídias (fotos e vídeos)
         let posicao = 0;
         let timer = null;
         let hintTimer = null;
-        const DURACAO = 6500;     // ms por foto
+        const DURACAO = 6500;        // ms por foto
+        const DURACAO_VIDEO = 4500;  // só os primeiros segundos de cada vídeo
 
         function shuffle(arr) {
             const a = [...arr];
@@ -283,10 +285,10 @@
             slide.classList.add('kb-run');
         }
 
-        function proximaImagem() {
-            if (ordem.length === 0) return;
-            const path = ordem[posicao % ordem.length];
-            posicao++;
+        function mostrarFoto(path) {
+            // Esconde o vídeo, se estiver visível
+            videoEl.classList.remove('show');
+            videoEl.pause();
 
             const back = slides[1 - frontIndex];
             const front = slides[frontIndex];
@@ -298,23 +300,59 @@
             back.classList.add('show');
             front.classList.remove('show');
             frontIndex = 1 - frontIndex;
+
+            timer = setTimeout(proximaMidia, DURACAO);
+        }
+
+        function mostrarVideo(path) {
+            // Esconde as fotos
+            slides.forEach(s => s.classList.remove('show'));
+
+            videoEl.src = path;
+            videoEl.classList.add('show');
+            try { videoEl.currentTime = 0; } catch (_) {}
+            const p = videoEl.play();
+            if (p && p.catch) p.catch(() => {});
+
+            // Só os primeiros segundos do tempo de um slide
+            timer = setTimeout(proximaMidia, DURACAO_VIDEO);
+        }
+
+        function proximaMidia() {
+            if (ordem.length === 0) return;
+            clearTimeout(timer);
+            const item = ordem[posicao % ordem.length];
+            posicao++;
+
+            if (item.isVideo) {
+                mostrarVideo(item.path);
+            } else {
+                mostrarFoto(item.path);
+            }
         }
 
         function abrirSlideshow() {
-            const imgs = (window.mediaItems || [])
-                .filter(m => !m.isVideo)
-                .map(m => m.path);
-            if (imgs.length === 0) {
-                showToast('Nenhuma foto disponível.', true);
+            const itens = (window.mediaItems || []);
+            if (itens.length === 0) {
+                showToast('Nenhuma mídia disponível.', true);
                 return;
             }
-            ordem = shuffle(imgs);
+            ordem = shuffle(itens);
             posicao = 0;
 
-            // Cria/zera os dois slides
+            // Cria/zera os dois slides de foto + o elemento de vídeo
             stage.innerHTML = '';
             slides = [document.createElement('div'), document.createElement('div')];
             slides.forEach(s => { s.className = 'slideshow-slide'; stage.appendChild(s); });
+
+            videoEl = document.createElement('video');
+            videoEl.className = 'slideshow-video';
+            videoEl.muted = true;
+            videoEl.playsInline = true;
+            videoEl.setAttribute('playsinline', '');
+            videoEl.setAttribute('preload', 'auto');
+            stage.appendChild(videoEl);
+
             frontIndex = 0;
 
             overlay.classList.add('active');
@@ -325,8 +363,7 @@
                 overlay.requestFullscreen().catch(() => {});
             }
 
-            proximaImagem();                 // primeira foto imediatamente
-            timer = setInterval(proximaImagem, DURACAO);
+            proximaMidia();                  // primeira mídia imediatamente
 
             // Esconde a dica após alguns segundos
             hint.style.opacity = '1';
@@ -336,8 +373,14 @@
 
         function fecharSlideshow() {
             overlay.classList.remove('active');
-            clearInterval(timer);
+            clearTimeout(timer);
             timer = null;
+            if (videoEl) {
+                videoEl.pause();
+                videoEl.removeAttribute('src');
+                videoEl.load();
+                videoEl = null;
+            }
             stage.innerHTML = '';
             slides = [];
             document.body.style.overflow = 'auto';

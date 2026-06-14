@@ -48,95 +48,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const basePath = '../Fotos/';
 
-    // Manifesto gerado por scripts/build-manifest.mjs com as datas reais
-    // (metadados EXIF/vídeo), já em ordem cronológica. Vídeos usam as versões
+    // Embaralha (Fisher-Yates) sem alterar o array original
+    const shuffle = (arr) => {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    };
+
+    // Caminhos de arquivo do WhatsApp têm espaços e parênteses: cada segmento
+    // precisa ser codificado para virar uma URL válida.
+    const toPath = (file) => basePath + file.split('/').map(encodeURIComponent).join('/');
+
+    // Manifesto gerado por scripts/build-manifest.mjs. Sem ordem cronológica:
+    // três coleções (nascimento, festa, geral). Vídeos usam as versões
     // comprimidas *_web.mp4 (< 100 MB, aceitas pelo GitHub).
-    const mediaItems = window.MEDIA_MANIFEST.map(entry => ({
+    const toItems = (arr, collection) => arr.map(entry => ({
         filename: entry.file,
-        path: basePath + entry.file,
-        date: new Date(entry.date).getTime(),
+        path: toPath(entry.file),
         isVideo: entry.type === 'video',
-        estimated: !!entry.estimated
+        collection
     }));
 
-    // "ultima.jpeg" não está no manifesto: fecha a timeline no aniversário
-    mediaItems.push({
-        filename: 'ultima.jpeg',
-        path: basePath + 'ultima.jpeg',
-        date: new Date('2026-06-02T12:00:00').getTime(),
-        isVideo: false,
-        estimated: false
-    });
+    const M = window.MEDIA_MANIFEST || { nascimento: [], festa: [], geral: [] };
+    const nascimentoItems = toItems(M.nascimento, 'nascimento');
+    const festaItems = toItems(M.festa, 'festa');
+    const geralItems = toItems(M.geral, 'geral');
 
-    // Apenas a primeira e a última memória têm legenda
-    mediaItems[0].caption = '2 de junho de 2025';
-    mediaItems[mediaItems.length - 1].caption = '2 de junho de 2026';
-
-    // Exposto para o slide show e o sistema de depoimentos (depoimentos.js)
+    // Todas as mídias — para o slide show e o sistema de depoimentos
+    const mediaItems = [...nascimentoItems, ...geralItems, ...festaItems];
     window.mediaItems = mediaItems;
 
-    // Marquee Injection (Random 15 images)
+    // Marquee Injection (fotos aleatórias da nuvem)
     const marqueeTrack = document.getElementById('marquee-track');
-    const shuffledForMarquee = [...mediaItems].filter(m => !m.isVideo).sort(() => 0.5 - Math.random()).slice(0, 15);
-    
-    shuffledForMarquee.forEach(item => {
+    const shuffledForMarquee = shuffle(geralItems.filter(m => !m.isVideo)).slice(0, 15);
+
+    const addMarquee = (item) => {
         const div = document.createElement('div');
         div.className = 'marquee-item';
         div.innerHTML = `<img src="${item.path}" alt="Cosmo Memória" loading="lazy">`;
         div.onclick = () => openLightbox(item);
         marqueeTrack.appendChild(div);
-    });
+    };
+    shuffledForMarquee.forEach(addMarquee);
+    shuffledForMarquee.forEach(addMarquee); // duplica para loop contínuo
 
-    // Duplicate marquee items for seamless loop
-    shuffledForMarquee.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'marquee-item';
-        div.innerHTML = `<img src="${item.path}" alt="Cosmo Memória" loading="lazy">`;
-        div.onclick = () => openLightbox(item);
-        marqueeTrack.appendChild(div);
-    });
-
-    // Timeline Injection
-    const timeline = document.getElementById('timeline');
-    
-    mediaItems.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'timeline-item';
-        
-        // Vídeos tocam sozinhos (mudos, em loop) quando entram na tela;
-        // o som fica disponível no lightbox
-        const mediaContent = item.isVideo
+    // Nuvem de fotos: a coleção geral embaralhada, em mosaico (masonry)
+    const cloud = document.getElementById('photo-cloud');
+    shuffle(geralItems).forEach(item => {
+        const fig = document.createElement('figure');
+        fig.className = 'cloud-item';
+        fig.innerHTML = item.isVideo
             ? `<video src="${item.path}" muted loop playsinline preload="metadata"></video>`
-            : `<img src="${item.path}" alt="Cosmo" loading="lazy">`;
-
-        const dateLabel = item.caption
-            ? `<div class="timeline-date">${item.caption}</div>`
-            : '';
-
-        div.innerHTML = `
-            <div class="timeline-dot"></div>
-            <div class="timeline-content" onclick="openLightbox(${index})">
-                ${dateLabel}
-                <div class="media-container">
-                    ${mediaContent}
-                </div>
-            </div>
-        `;
-        timeline.appendChild(div);
+            : `<img src="${item.path}" alt="Memória de Cosmo" loading="lazy">`;
+        fig.addEventListener('click', () => openLightbox(item));
+        cloud.appendChild(fig);
     });
 
-    // Intersection Observer for Timeline Animations
+    // Revela os itens da nuvem ao entrarem na tela
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-
-    document.querySelectorAll('.timeline-item').forEach(item => {
-        observer.observe(item);
-    });
+    }, { threshold: 0.05, rootMargin: "0px 0px -40px 0px" });
+    document.querySelectorAll('.cloud-item').forEach(item => observer.observe(item));
 
     // Autoplay dos vídeos: toca ao entrar na tela, pausa ao sair
     const videoObserver = new IntersectionObserver((entries) => {
@@ -151,8 +131,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, { threshold: 0.25 });
 
-    document.querySelectorAll('.media-container video').forEach(video => {
+    document.querySelectorAll('.cloud-item video').forEach(video => {
         videoObserver.observe(video);
+    });
+
+    // ====================================================
+    //  Galeria das coleções (Nascimento / Festa)
+    // ====================================================
+    const galleryOverlay = document.getElementById('gallery-overlay');
+    const galleryGrid = document.getElementById('gallery-grid');
+    const galleryTitle = document.getElementById('gallery-title');
+    const gallerySub = document.getElementById('gallery-sub');
+    const galleryClose = document.getElementById('gallery-close');
+
+    const openGallery = (items, title, sub) => {
+        galleryTitle.textContent = title;
+        gallerySub.textContent = sub;
+        galleryGrid.innerHTML = '';
+        items.forEach(item => {
+            const fig = document.createElement('figure');
+            fig.className = 'gallery-cell';
+            fig.innerHTML = item.isVideo
+                ? `<video src="${item.path}" muted loop playsinline preload="metadata"></video>`
+                : `<img src="${item.path}" alt="${title}" loading="lazy">`;
+            fig.addEventListener('click', () => openLightbox(item));
+            galleryGrid.appendChild(fig);
+        });
+        galleryOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeGallery = () => {
+        galleryOverlay.classList.remove('active');
+        galleryGrid.innerHTML = '';
+        if (!lightbox.classList.contains('active')) {
+            document.body.style.overflow = 'auto';
+        }
+    };
+
+    document.getElementById('portal-nascimento').addEventListener('click', () => {
+        openGallery(nascimentoItems, 'Nascimento', '02 de junho de 2025');
+    });
+    document.getElementById('portal-festa').addEventListener('click', () => {
+        openGallery(festaItems, 'A Festa', '1 ano depois...');
+    });
+    galleryClose.addEventListener('click', closeGallery);
+    galleryOverlay.addEventListener('click', (e) => {
+        if (e.target === galleryOverlay) closeGallery();
     });
 
     // Lightbox Logic
@@ -193,7 +218,10 @@ document.addEventListener('DOMContentLoaded', () => {
         lightboxVideo.pause();
         lightboxVideo.src = '';
         lightboxImg.src = '';
-        document.body.style.overflow = 'auto';
+        // Se a galeria está aberta atrás do lightbox, mantém o scroll travado
+        if (!galleryOverlay.classList.contains('active')) {
+            document.body.style.overflow = 'auto';
+        }
     };
 
     closeBtn.addEventListener('click', closeLightbox);
@@ -202,8 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+        if (e.key !== 'Escape') return;
+        if (lightbox.classList.contains('active')) {
             closeLightbox();
+        } else if (galleryOverlay.classList.contains('active')) {
+            closeGallery();
         }
     });
 });
