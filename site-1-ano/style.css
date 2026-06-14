@@ -679,17 +679,30 @@ body {
 }
 
 .close-btn {
-    position: absolute;
-    top: 2rem;
-    right: 3rem;
+    position: fixed;
+    top: max(1rem, env(safe-area-inset-top));
+    right: max(1rem, env(safe-area-inset-right));
+    z-index: 10; /* sempre acima da imagem/conteúdo do lightbox */
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: white;
-    font-size: 3rem;
+    font-size: 2.25rem;
+    line-height: 1;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: transform 0.3s ease, background 0.3s ease;
 }
 
 .close-btn:hover {
     transform: rotate(90deg) scale(1.1);
+    background: rgba(0, 0, 0, 0.75);
 }
 
 .lightbox-content {
